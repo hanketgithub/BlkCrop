@@ -1,3 +1,11 @@
+//
+//  BlkCrop.c
+//  BlkCrop
+//
+//  Created by Hank Lee on 11/29/16.
+//  Copyright (c) 2016 Hank Lee. All rights reserved.
+//
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +31,7 @@ int main(int argc, char *argv[])
     uint8_t buf[CTU_SIZE];
     uint32_t width_in_blk;
     int offset;
+    int ret;
     
     char output[255];
 
@@ -59,8 +68,16 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < CTU_SIZE; i++)
     {
-        read(ifd, buf, CTU_SIZE);
-        write(ofd, buf, CTU_SIZE);
+        ret = read(ifd, buf, CTU_SIZE);
+		if (ret != CTU_SIZE)
+		{
+			goto main_ret;
+		}
+        ret = write(ofd, buf, CTU_SIZE);
+		if (ret != CTU_SIZE)
+		{
+			goto main_ret;
+		}
         lseek(ifd, offset + (i+1)* width, SEEK_SET);    
     }
 
@@ -72,8 +89,16 @@ int main(int argc, char *argv[])
     
     for (int i = 0; i < CTU_SIZE / 2; i++)
     {
-        read(ifd, buf, CTU_SIZE / 2);
-        write(ofd, buf, CTU_SIZE / 2);
+        ret = read(ifd, buf, CTU_SIZE / 2);
+		if (ret != CTU_SIZE / 2)
+		{
+			goto main_ret;
+		}
+        ret = write(ofd, buf, CTU_SIZE / 2);
+		if (ret != CTU_SIZE / 2)
+		{
+			goto main_ret;
+		}
         lseek(ifd, (offset) + (i+1) * (width / 2), SEEK_SET);       
     }
 
@@ -85,13 +110,24 @@ int main(int argc, char *argv[])
     
     for (int i = 0; i < CTU_SIZE / 2; i++)
     {
-        read(ifd, buf, CTU_SIZE / 2);
-        write(ofd, buf, CTU_SIZE / 2);
+        ret = read(ifd, buf, CTU_SIZE / 2);
+		if (ret != CTU_SIZE / 2)
+		{
+			goto main_ret;
+		}
+        ret = write(ofd, buf, CTU_SIZE / 2);
+		if (ret != CTU_SIZE / 2)
+		{
+			goto main_ret;
+		}
         lseek(ifd, (offset) + (i+1) * (width / 2), SEEK_SET);   
     }
 
     close(ifd);
     close(ofd);
 
+	printf("Output: %s\n", output);
+
+main_ret:
     return 0;   
 }
